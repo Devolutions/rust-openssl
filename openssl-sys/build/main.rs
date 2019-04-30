@@ -80,6 +80,9 @@ fn main() {
         },
     };
 
+#[cfg(feature = "conan-build")]
+    let libs = vec!["ssl", "crypto"];
+
     let kind = determine_mode(Path::new(&lib_dir), &libs);
     for lib in libs.into_iter() {
         println!("cargo:rustc-link-lib={}={}", kind, lib);
