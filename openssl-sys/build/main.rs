@@ -14,7 +14,8 @@ use std::path::{Path, PathBuf};
 mod cfgs;
 
 #[cfg_attr(feature = "vendored", path = "find_vendored.rs")]
-#[cfg_attr(not(feature = "vendored"), path = "find_normal.rs")]
+#[cfg_attr(feature = "conan-build", path = "find_conan.rs")]
+#[cfg_attr(all(not(feature = "vendored"), not(feature = "conan-build")), path = "find_normal.rs")]
 mod find;
 
 enum Version {
