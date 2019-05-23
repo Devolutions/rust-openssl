@@ -42,6 +42,7 @@ fn env(name: &str) -> Option<OsString> {
 }
 
 fn main() {
+    check_conan_build();
     check_rustc_versions();
 
     let target = env::var("TARGET").unwrap();
@@ -90,6 +91,29 @@ fn main() {
         println!("cargo:rustc-link-lib=dylib=crypt32");
         println!("cargo:rustc-link-lib=dylib=ws2_32");
         println!("cargo:rustc-link-lib=dylib=advapi32");
+    }
+}
+
+extern crate conan;
+use conan::*;
+
+fn check_conan_build() {
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+    let conan_profile = format!("{}-{}", target_os, target_arch);
+
+    let command = InstallCommandBuilder::new()
+        .with_profile(&conan_profile)
+        .build_policy(BuildPolicy::Missing)
+        .recipe_path(Path::new("build/conanfile.txt"))
+        .build();
+
+    if let Some(build_info) = command.generate() {
+        println!("using conan build info");
+        let openssl = build_info.get_dependency("openssl").unwrap();
+        let openssl_dir = openssl.get_root_dir().unwrap();
+        println!("OPENSSL_DIR: {}", openssl_dir);
+        env::set_var("OPENSSL_DIR", openssl_dir);
     }
 }
 

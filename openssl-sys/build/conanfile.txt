@@ -1,0 +1,5 @@
+[requires]
+openssl/1.1.1b-2@devolutions/stable
+
+[generators]
+json
